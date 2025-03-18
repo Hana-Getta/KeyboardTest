@@ -211,9 +211,9 @@
       }
 
       document.addEventListener("keydown", (event) => {
-        if (/[\u3131-\uD79D]/.test(event.key)) {
-          alert("한글 입력이 감지되었습니다.");
-        }
+        // if (/[\u3131-\uD79D]/.test(event.key)) {
+        //   alert("한글 입력이 감지되었습니다.");
+        // }
 
         if (event.key === "Tab") {
           event.preventDefault();
@@ -255,6 +255,8 @@
         if (keyElement) {
           keyElement.classList.add("pressed-key");
         }
+
+        highlightNextKey();
       });
 
       document.addEventListener("keyup", (event) => {
