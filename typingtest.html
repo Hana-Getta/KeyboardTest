@@ -197,6 +197,11 @@
       }
 
       document.addEventListener("keydown", (event) => {
+        if (event.key === "Tab") {
+          event.preventDefault();
+          handleInput(currentInput + "  ");
+          return;
+        }
         if (event.key.length === 1 || event.key === "Backspace") {
           handleInput(
             event.key === "Backspace"
