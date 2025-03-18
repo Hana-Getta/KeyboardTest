@@ -189,6 +189,7 @@
 
       function handleShift() {
         let currentLayout = keyboard.options.layoutName;
+        console.log(currentLayout);
         let shiftToggle = currentLayout === "default" ? "shift" : "default";
 
         keyboard.setOptions({
@@ -214,10 +215,10 @@
         );
         if (keyElement) {
           keyElement.classList.add("pressed-key");
-
-          if (event.shiftKey) {
-            handleShift();
-          }
+        }
+        if (event.key === "Shift") {
+          //shift키 누르고 있을때
+          keyboard.setOptions({ layoutName: "shift" });
         }
       });
 
@@ -227,6 +228,11 @@
         );
         if (keyElement) {
           keyElement.classList.remove("pressed-key");
+        }
+
+        if (event.key === "Shift") {
+          //shift키 안 누를때
+          keyboard.setOptions({ layoutName: "default" });
         }
       });
 
