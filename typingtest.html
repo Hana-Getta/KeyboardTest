@@ -52,6 +52,11 @@
   </head>
   <body>
     <h1>타자 연습</h1>
+    <div id="score-display">
+      <span id="typed-count">타자 수: 0</span> |
+      <span id="accuracy">정확도: 100%</span> |
+      <span id="cpm">CPM: 0</span>
+    </div>
     <pre id="text-display"></pre>
     <div class="keyboard-container">
       <div class="simple-keyboard"></div>
@@ -74,6 +79,8 @@
         '   cout << "Greetings!" << endl;',
         "}",
       ];
+
+      const origin = textLines;
 
       let currentLineIndex = 0;
       let currentInput = "";
@@ -112,6 +119,35 @@
         debug: true
       });
 
+      let totalTyped = 0; // 총 타자 수
+      let correctTyped = 0; // 정확히 입력한 문자 수
+      let startTime = null; // 타이핑 시작 시간
+      let cpmInterval = null; // CPM 계산을 위한 타이머
+
+      function updateScore() {
+        const accuracy = totalTyped > 0 ? ((correctTyped / totalTyped) * 100).toFixed(2) : 100;
+        const elapsedTime = (Date.now() - startTime) / 60000; // 경과 시간 (분 단위)
+        const cpm = elapsedTime > 0 ? Math.floor(totalTyped / elapsedTime) : 0;
+
+        document.getElementById("typed-count").textContent = `타자 수: ${totalTyped}`;
+        document.getElementById("accuracy").textContent = `정확도: ${accuracy}%`;
+        document.getElementById("cpm").textContent = `CPM: ${cpm}`;
+      }
+
+      function startCPMTracking() {
+        if (!startTime) {
+          startTime = Date.now(); // 타이핑 시작 시간 기록
+        }
+        if (!cpmInterval) {
+          cpmInterval = setInterval(updateScore, 1000); // 1초마다 점수 업데이트
+        }
+      }
+
+      function stopCPMTracking() {
+        clearInterval(cpmInterval);
+        cpmInterval = null;
+      }
+
       function updateDisplay() {
         // 기존 내용 초기화
         while (textDisplay.firstChild) {
@@ -148,12 +184,37 @@
       }
 
       function handleInput(input) {
+        startCPMTracking(); // 타이핑 시작 시 CPM 추적 시작
+
+        if (input.length < currentInput.length) {
+          // Backspace 입력 처리
+          const removedChar = currentInput[currentInput.length - 1];
+          const expectedChar = textLines[currentLineIndex][currentInput.length - 1];
+
+          if (removedChar === expectedChar) {
+            correctTyped--; // 정확히 입력한 문자 수 감소
+          }
+          totalTyped--; // 총 타자 수 감소
+        } else {
+          // 일반 입력 처리
+          totalTyped++; // 타자 수 증가
+          const currentChar = textLines[currentLineIndex][input.length - 1];
+          const typedChar = input[input.length - 1];
+
+          if (typedChar === currentChar) {
+            correctTyped++; // 정확히 입력한 문자 수 증가
+          }
+        }
+
         currentInput = input;
+
         if (currentInput.length >= textLines[currentLineIndex].length) {
           currentLineIndex++;
           currentInput = "";
         }
+
         updateDisplay();
+        updateScore(); // 점수 업데이트
         keyboard.setInput(currentInput);
       }
 
@@ -275,6 +336,10 @@
       });
 
       updateDisplay();
+      console.log(origin)
+
+      // 페이지를 떠날 때 타이머 정리
+      window.addEventListener("beforeunload", stopCPMTracking);
     </script>
   </body>
 </html>
